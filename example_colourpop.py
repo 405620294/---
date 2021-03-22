@@ -40,36 +40,38 @@ def tao_comment(url):
 		test = link.split('currentPage=1')
 
 		while True:
+			# 翻頁
 			url = test[0] + 'currentPage=' + str(page) + test[1]
-
 			response = requests.get(url, verify=False, headers=header).text
+			
+			# 先將json格式外套的字串打開
 			replace_word = str(url.split('=')[-1]) + '('
 			response = response.replace(replace_word, '')
 			response = response.replace(')', '')
 
+			# 讀取json
 			datas = json.loads(response)
+			
 			rateDetail = datas['rateDetail']
 			rateList = rateDetail['rateList']
-
-			paginator = rateDetail['paginator']
-			lastpage = paginator['lastPage']
+			lastpage = rateDetail['paginator']['lastPage']
 
 			for i in rateList:
-				user_id = i['id']
+				user_id = i['id'] # 評論者ID
 				product = i['auctionSku'].split('【')[0].upper().split(':')[1].split("-")
-				product = " ".join(product)
-				firsst_time = i['rateDate']
-				first_comment = i['rateContent']
+				product = " ".join(product)  # 產品名稱
+				firsst_time = i['rateDate'] # 初評時間
+				first_comment = i['rateContent']  # 初評內容
 
-				table1["id"].append(user_id)
+				table1["id"].append(user_id) 
 				table1["product"].append(product)
-				table1["1st_time"].append(firsst_time)
+				table1["1st_time"].append(firsst_time) 
 				table1["1st_comment"].append(first_comment)
 
 				se_contents = i['appendComment']
 				if not se_contents == None:
-					se_time = se_contents['commentTime']
-					se_comment = se_contents['content']
+					se_time = se_contents['commentTime'] # 追評時間
+					se_comment = se_contents['content'] # 追評內容
 
 					table1["2nd_time"].append(se_time)
 					table1["2nd_comment"].append(se_comment)
